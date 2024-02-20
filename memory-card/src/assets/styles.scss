@@ -1,6 +1,8 @@
-body {
+@font-face {
+    font-family: great-vibes;
+    src: url('./GreatVibes-Regular.ttf')
 }
 
-Button {
-
+h1 {
+    font-family: great-vibes;
 }

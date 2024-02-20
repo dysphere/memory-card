@@ -20,6 +20,8 @@ export default function MemoryCard() {
     const [firstThird, setFirstThird] = useState([]);
     const [secondThird, setSecondThird] = useState([]);
     const [lastThird, setLastThird] = useState([]);
+    const [score, setScore] = useState(0);
+    const [bestScore, setBestScore] = useState(0);
 
     useEffect(() => {
         const fetchImages = async () => {
@@ -43,36 +45,71 @@ export default function MemoryCard() {
 
     }, [images]);
 
-    function shuffle(array) {
-        console.log("hi")
+    useEffect(() => {
+        
+    }, [score]);
+
+    function shuffle(imageid) {
+        setImages(prevImages => {
+            const clickCheck = prevImages.some(image => image.id === imageid && image.clickedAlready)
+            const updatedImages = prevImages.map(image => {
+                if (imageid === image.id && !clickCheck) {
+                    setScore(score + 1);
+                    return {...image, clickedAlready: !image.clickedAlready};
+                }
+                else if (imageid === image.id && clickCheck) {
+                    if (score > bestScore) {
+                        setBestScore(score);
+                    }
+                    setScore(0);
+                    return {...image, clickedAlready: false};
+                }
+                else {
+                    return image;
+                }
+            });
+            return updatedImages;
+        });
     }
 
     return (
         <div>
-    {images ? 
+    {images ?
+    <Container fluid>
+        <Container fluid className="d-flex justify-content-between">
+            <div>
+                <h1>Art Memory Game</h1>
+                <p>Click on different images of Cezanne's art to get points but beware, clicking on the same one twice resets your game</p>
+            </div>
+            <div>
+                <p>Score: {score}</p>
+                <p>Best Score: {bestScore}</p>
+            </div>
+        </Container>
       <Container fluid className="">
         <Row className="">
           {firstThird.map((image) => (
             <Col key={image.id} xs={12} md={3}>
-              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={shuffle}/>
+              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={()=>shuffle(image.id)}/>
             </Col>
           ))}
           </Row>
           <Row>
           {secondThird.map((image) => (
             <Col key={image.id} xs={12} md={3}> 
-              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={shuffle}/>
+              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={()=>shuffle(image.id)}/>
             </Col>
           ))}
           </Row>
           <Row>
           {lastThird.map((image) => (
             <Col key={image.id} xs={12} md={3}> 
-              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={shuffle}/>
+              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={()=>shuffle(image.id)}/>
             </Col>
           ))}
           </Row>
       </Container> 
+      </Container>
     : <div>Loading...</div>}
   </div>
     )
