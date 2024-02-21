@@ -3,14 +3,14 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './assets/styles.scss'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function ButtonTemplate({name, src, onClick}) {
+function ButtonTemplate({name, src, onClick, imid}) {
 return (<>
-<Button onClick={onClick}>
-    <img src={src} className="img-fluid"/>
+<Button onClick={onClick} className="aspect-ratio">
+    <img src={src} className={`item-${imid} img-fluid`} />
     <p>{name}</p>
 </Button></>)
 }
@@ -22,12 +22,14 @@ export default function MemoryCard() {
     const [lastThird, setLastThird] = useState([]);
     const [score, setScore] = useState(0);
     const [bestScore, setBestScore] = useState(0);
+    const prevImagesRef = useRef(null);
 
     useEffect(() => {
         const fetchImages = async () => {
             try {
                 const artImages = await metImages();
                 setImages(artImages)
+                prevImagesRef.current = artImages;
             }
             catch (error) {
                 console.error("Failed to fetch images: ", error)
@@ -46,7 +48,17 @@ export default function MemoryCard() {
     }, [images]);
 
     useEffect(() => {
-        
+        if (images && images.length > 0) {
+            let shuffled = [...images];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            if (JSON.stringify(shuffled) != JSON.stringify(prevImagesRef.current)) {
+                setImages(shuffled);
+                prevImagesRef.current = shuffled;
+            }
+        }
     }, [score]);
 
     function shuffle(imageid) {
@@ -68,6 +80,7 @@ export default function MemoryCard() {
                     return image;
                 }
             });
+            prevImagesRef.current = updatedImages;
             return updatedImages;
         });
     }
@@ -90,21 +103,21 @@ export default function MemoryCard() {
         <Row className="">
           {firstThird.map((image) => (
             <Col key={image.id} xs={12} md={3}>
-              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={()=>shuffle(image.id)}/>
+              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={()=>shuffle(image.id)} imid={image.id}/>
             </Col>
           ))}
           </Row>
           <Row>
           {secondThird.map((image) => (
             <Col key={image.id} xs={12} md={3}> 
-              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={()=>shuffle(image.id)}/>
+              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={()=>shuffle(image.id)} imid={image.id}/>
             </Col>
           ))}
           </Row>
           <Row>
           {lastThird.map((image) => (
             <Col key={image.id} xs={12} md={3}> 
-              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={()=>shuffle(image.id)}/>
+              <ButtonTemplate src={image.objectURL} name={image.objectName} onClick={()=>shuffle(image.id)} imid={image.id}/>
             </Col>
           ))}
           </Row>
