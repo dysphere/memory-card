@@ -4,12 +4,12 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import React, { useState, useEffect, useRef } from 'react';
-import './assets/styles.scss'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './assets/styles.scss'
 
 function ButtonTemplate({name, src, onClick, imid}) {
 return (<>
-<Button onClick={onClick} className="aspect-ratio">
+<Button onClick={onClick} className="aspect-ratio" variant="classy">
     <img src={src} className={`item-${imid} img-fluid`} />
     <p>{name}</p>
 </Button></>)
@@ -94,7 +94,7 @@ export default function MemoryCard() {
                 <h1>Art Memory Game</h1>
                 <p>Click on different images of Cezanne's art to get points but beware, clicking on the same one twice resets your game</p>
             </div>
-            <div>
+            <div className="score">
                 <p>Score: {score}</p>
                 <p>Best Score: {bestScore}</p>
             </div>
